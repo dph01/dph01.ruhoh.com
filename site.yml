@@ -1,16 +1,14 @@
-title : Blog Title
-tagline: Blog Tagline
+title : Damian Helme
+tagline: Thoughts on tech stuff ...
 author :
-  name : Firstname Lastname
-  email : blah@email.test
-  github : username
-  twitter : username
+  name : Damian Helme
+  email : tech@damianhelme.com
+  github : dph01
+  twitter : damianhelme
   feedburner : feedname
 
 navigation :
   - archive.html
   - tags.html
   - categories.html
-  - pages.html
-  - about.md
   

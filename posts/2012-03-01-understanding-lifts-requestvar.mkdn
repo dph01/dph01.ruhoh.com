@@ -1,0 +1,113 @@
+---
+layout: post
+title:  Understanding Lift's RequestVar
+date: 2012-03-01
+tags: [scala, lift]
+categories: [code]
+permalink: understanding-lifts-requestvars
+---
+
+    <p>This post aims to answer some of the questions I originally struggled with when I started using RequestVar's. I think I've got to grips with them sufficiently to help others who are wrestling with the same issue :-). So, here's my contribution to the Lift corpus ...</p>
+<p>Consider the common use case, whereby when the user submits a form,  if the data fails validation, the data entered is re-presented to the user for correction.  The following common pattern meets this requirement by using a RequestVar to hold the state of the submitted data between requests.</p>
+<p>The snippet:</p>
+<div class="CodeRay">
+  <div class="code"><pre>class NameSnippet {
+
+  object nameRV extends RequestVar(&quot;&quot;)                // 1
+
+  def processSubmit() = {
+    // perform some simple validation
+    if (nameRV.is.length &lt; 3) 
+      S.error(&quot;event name must be at least 3 characters&quot;)
+    else {
+      S.notice(&quot;name OK&quot;)
+      S.redirectTo(&quot;/&quot;)
+    }
+  }
+
+  def render = {
+    &quot;#name&quot; #&gt; SHtml.text(nameRV.is, x =&gt; nameRV(x) ) &amp; // 2
+    &quot;#submit&quot; #&gt; SHtml.onSubmitUnit(processSubmit)      // 3
+  }
+}</pre></div>
+</div>
+
+<p>The HTML template, name.html:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&lt;div data-lift=&quot;lift:surround?with=default;at=content&quot;&gt;
+  &lt;div data-lift=&quot;NameSnippet?form=post&quot;&gt;                &lt;!-- 4 --&gt;
+     Name: &lt;input id=&quot;name&quot; type=&quot;text&quot;/&gt;&lt;br /&gt;
+     &lt;input id=&quot;submit&quot; type=&quot;submit&quot;/&gt; &lt;br /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre></div>
+</div>
+
+<p>When I first came across this use of RequestVar, I struggled to understand what the RequestVar gives us  that we wouldn't get from using a regular var: what was going on in  line (2) with closures and scope  - weren't the name variables being set and read in different scopes? How could they be communicating?</p>
+<p>To help answer these questions, I'll break the processing chain down to the basic steps:</p>
+<ol>
+<li>
+<p>The user types in the url of our web form, <a href="http://localhost:8080/name">http://localhost:8080/name</a>, say, sending an initial HTTP GET request to  the server.</p>
+</li>
+<li>
+<p>Having resolved the request to the name.html template, Lift creates an instance of the NameSnippet class and calls the 'render' method to transform the contents of the HTML template node at line (4).</p>
+</li>
+<li>
+<p>In 'render', at line (2), Lift transforms the content of name input node in our HTML into something like:</p>
+<div class="CodeRay">
+  <div class="code"><pre>&lt;input id=&quot;name&quot; name=&quot;F1235075760726VICVPV&quot; type=&quot;text&quot; value=&quot;&quot;/&gt;</pre></div>
+</div>
+
+<p>The 'value' attribute is set from calling nameRV.is. This is the first time nameRV is accessed and so Scala initialises the nameRV object at this point (remember Scala only initialises objects when they are first accessed).</p>
+<p>As we are calling the 'is' method before nameRV has been set, before Lift returns us a value,  it sets nameRV to contain the default value we specified at (1), namely the empty string.</p>
+<p>Lift also keeps a record of the  anonymous function 'x =&gt; nameRV(x)', which it will call  later when the user submits the form. The name="F1235075760726VICVPV" attribute is Lift's mechanism for identifying which function is to be called. It will be called with the value the user enters in the Name input field. This function creates a closure around the nameRV object in the scope of the NameSnippet instance used to service this initial request.</p>
+</li>
+<li>
+<p>At line (3), Lift transforms the content of the 'submit' input node into something like:</p>
+<div class="code">
+<div class="CodeRay">
+  <div class="code"><pre>&lt;input id=&quot;submit&quot; name=&quot;F1235075860727PTINTI&quot; type=&quot;submit&quot; /&gt;</pre></div>
+</div>
+
+</div>
+<p>As above, Lift registers the processSubmit function  with the name F1235075860727PTINTI which it will call when the user submits the form. Again, processSubmit is closing around the nameRV object in the scope of the NameSnippet created to service this initial request.</p>
+</li>
+<li>
+<p>When the user enters data into the name input field (say 'Jo') &amp; clicks 'submit',  a second request (this time a POST) is made to <a href="http://localhost:8080/name">http://localhost:8080/name</a>, sending  the following key-value pairs in the message body:</p>
+<div class="CodeRay">
+  <div class="code"><pre>F1235075760726VICVPV:Jo 
+F1235075860727PTINTI:Submit</pre></div>
+</div>
+
+<p>Lift recognises the two keys as being function identifiers, and looks up and calls the functions in the order in which they are received. Thus first, 'x =&gt; nameRV(x)' is called to set nameRV with the contents of the name input field. But remember, nameRV is the instance that was created in the scope of the first NameSnippet instance. Second, processSubmit is called, which, in the body of the method, reads the content of nameRV we have just set. Again, this is the nameRV in the scope of the first request.</p>
+</li>
+<li>
+<p>Suppose that the user had entered a name that passed validation (i.e. was more than three characters); processSubmit would then call redirectTo("/"), which throws an exception to interrupt the flow of control,  taking the user to "/". But in this example, the input name 'Jo' fails validation, and processSubmit exits normally and Lift carries on loading the input form, name.html.</p>
+</li>
+<li>
+<p>To service this second request, Lift creates a second instance of NameSnippet and calls NameSnippet.render again. This time, when nameRV.is is called at (2), the nameRV.is call returns "Jo" and the user consequently sees his input being re-presented to him, allowing him to correct the error.</p>
+</li>
+</ol>
+<p>But, how does this nameRV.is return 'Jo', when this nameRV object is in the scope of the  second request, but the nameRV that was set was in the scope of the first request?</p>
+<p>The answer lies in realising that there is lot more going on behind the scenes with RequestVar's than we might believe from their apparently simple usage.</p>
+<p>RequestVar's are actually acting as indices into a backing datastore: in this sense they are not acting as 'regular' variables (with normal scoping rules etc.) as the 'Var' in the name might suggest. When you set a RequestVar with something like nameRV("Jo"), the set method creates an entry in a  map, where the 'key' is based on the name of the variable (in this case, something like  liftsvcode.snippet.NameSnippet$nameRV$), and 'value' is what we're setting the RequestVar to (in this case 'Jo').</p>
+<p>This backing datastore is shared across all snippets and closures called during the processing a single HTTP request (and actually all Ajax calls arising from this request, but that's outside the scope of this post). Thus, even though the nameRV object on which the  set method is called is a different  instance from the one that is read, they are setting and reading the same datastore value. That is because&nbsp;they both use the  same name as the key into the same datastore. So, in this sense, RequestVar's are acting as variables that are accessible across scope boundaries.</p>
+<p>So, to answer the question of 'What does RequesVar's give us that regular var's don't?', if we tried to write our snippet with a regular var instead of a RequestVar, with something like:</p>
+<div class="CodeRay">
+  <div class="code"><pre>class NameSnippet {
+
+  var name = String(&quot;&quot;)                               // 1
+
+  def processSubmit() = { .... }
+
+  def render = {
+    &quot;#name&quot; #&gt; SHtml.text(name, x =&gt; {name = x} ) &amp; // 2
+    &quot;#submit&quot; #&gt; SHtml.onSubmitUnit(processSubmit)  // 3
+  }
+}</pre></div>
+</div>
+
+<p>... the closure that sets the name 'x =&gt; {name = x}' would be setting a different variable from the one that is being read with ' "#name" #&gt; SHtml.text(name, ... ' . Thus when the form validation fails and the form is rendered for a second time, the name field would be blank; not what we want!</p>
+<p>I'll be writing another post soon describing more advanced patterns using RequestVar's, so watch this space ...</p>
+<p>Please feel free to leave comments / questions etc.</p>
+<p>&nbsp;</p>
+  
