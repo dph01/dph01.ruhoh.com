@@ -4,6 +4,7 @@ title:  DIY Lift CRUD - an alternative to CRUDify
 date: 2012-06-04
 tags: [scala, lift]
 categories: [code]
+type: draft
 ---
 
 This article describes a simple approach for creating your own CRUD screens with Lift ( 
