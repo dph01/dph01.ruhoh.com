@@ -20,7 +20,7 @@ or even for use in production where your requirements aren't too complicated.
 The libraries have lots of usable, sensible defaults that gets you going quickly, potentially 
 saving you lots of boiler plate code. 
 If what you want doesn't quite match what Lift provides, 
-thanks to thoughtful class design and useful Scala language features you can easily override much of the 
+thanks to thoughtful class design and useful Scala language features, you can easily override much of the 
 default functionality.
 
 However, as your requirements grow you'll probably find your needs diverging more and more from 
@@ -34,21 +34,26 @@ Adding so much overriding code could easily leave you with
 overly bloated classes, 
 trying to coerce the Lift libraries to perform in ways that they were not designed to perform.
 
-When this happens it often makes more sense to write your own CRUD code from the ground up.
+When this happens it often makes more sense to write your own CRUD code from the ground up. 
+With a small investment of effort up front (and probably less than you would imagine)
+you will end up with more concise, easily maintainable code, saving you more time in the long run.
 
 ## What is covered?
-This article describes conventions for:
-organising the required code into methods, classes, files and folders; 
-naming conventions; 
-and a simple screen flow model.
+This article describes one simple approach for
+organising CRUD code into methods, classes, files and folders. 
+It gives a naming convention for the aforementioned artifacts 
+and a simple model depicting allowable screen transitions.
 
-It gives example code for how to perform many of the common CRUD based tasks such as
-managing state on the server between successive page requests, rendering HTML from the data
-stored in the database, and so on.
+It illustrates these principles by giving the complete code for a simple CRUD application 
+for a single database entity called Event, with a single field called 'eventName'.
 
-I illustrate these principles using simple single database entity called Event, 
-with a single field called 'eventName'.
-I use the Lift Mapper library to persist and retrieve data from the database, but the general principles could 
+It selects and discusses coding patterns to achieve
+implementation challenges such as how to 'manage state' on the server between
+successive page requests, how to use CSS Selector Transforms to to efficiently render
+data as HTML.
+
+I use the Lift Mapper library to persist and retrieve data from the database, 
+but the general principles could 
 be used equally well with Lift's Record library, or any other ORM for that matter.
 
 ## Prerequisites
@@ -68,7 +73,7 @@ You can download the code discussed in this article from http://www.github.com/d
 You can see a running version of this code at [www.damianhelme.com/crudbasic](www.damianhelme.com/crudbasic)
 
 ## Overview
-This user interacts with each data entity through a separate HTML page for each of the following: 
+The user interacts with each data entity through separate HTML pages for each of the following: 
 
   * creating a new instance
   * listing all existing instances
@@ -80,11 +85,11 @@ The diagram below shows the allowable page transitions, illustrated with the Eve
 We enter the screen flow through either the List or Create
 page and we can only navigate to the View, Edit and Delete pages through links on one of the other pages.
 
-[screen flow TBC]
+{{urls.media}}/CRUDBasicScreenFow.gif
 
 The code is split over a model file, a snippet file and series of HTML templates as shown below:
 
-[folder structure TBC]
+{{urls.media}}/folders.tiff
 
 ## Model
 We use Lift's Mapper class to manage database access. Each entity has its own scala file in the model package.
@@ -109,7 +114,7 @@ For example, the code for our Event entity (in /src/main/scala/code/model/Event.
 I have added in a simple validation rule to help test our handling of form submission failures later.
 
 ## HTML
-The HTML pages for manipulating each entity are derived from five Lift templates: 
+The HTML pages for manipulating entities are derived from five Lift templates.
 For our Event entity they are:
 
  * createevent.html
@@ -118,10 +123,10 @@ For our Event entity they are:
  * viewevent.hmtl. 
  * deleteevent.hmtl. 
  
-For each entity, the templates reside in their own sub-directory of src/main/webapp.
-E.g. for Event, they are in: src/main/webapp/event.
+The templates reside in sub-directories of src/main/webapp; one directory for each entity.
+E.g. the templates for Event are in: src/main/webapp/event.
 
-Access to these pages are defined in the SiteMap, in Boot.scala:
+Access to these pages are defined in the SiteMap in Boot.scala:
 
     Menu("Create Event") /  "event" / "createevent",
     Menu("List Events") /  "event" / "listevent",
@@ -134,7 +139,7 @@ these pages is via links on other pages.
 
 Note that there is a redundant 'event' in the path. One could have just had /event/create, /event/edit
 However, having 'event' repeated in the filename (i.e. createevent) allows you to easily distinguish between 
-multiple open files in an IDE such as Ecliplse.
+multiple open files in an IDE such as Eclipse.
 
 The contents of each of the HTML templates is given below, adjacent to the corresponding snippet.
 
@@ -170,18 +175,18 @@ Lift returns a HTML form to the browser with the 'action' attribute set to be th
 When the form is then submitted,
 the browser makes a HTTP PUT request to this same URL, sending the form data in the body of the request. 
 
-As Lift developers we have to decide what we return to the user in response to this PUT.
+We Lift developers we have to decide what we return to the user in response to this PUT.
 
 Within the context of this approach, we use the following convention: 
 
   * If the form processing fails (e.g. the name field contains less than three characters)
-we return the same form HTML again, but this time with the 
+we return the same HTML form again, but this time with the 
 input fields populated with the contents that the user has just submitted. 
 If the user clicks submit again the browser makes another PUT request, and so the
 cycle continues.
   * On the other hand, if the form processing succeeds, 
 we redirect the browser to the
-next page in the work-flow, which, in our case we choose the list events page.
+next page in the work-flow, which, in our case we choose to be the list events page.
 
 Thus, every time a form is processed the snippet behind the form is called at least twice; 
 once for the initial GET request and once more for every subsequent PUT request.
@@ -192,7 +197,7 @@ state between successive HTML page requests. For the Event instance, this is dec
 
       object eventRV extends RequestVar[Event](Event.create)
 
- We use the RequestVar to pass Event instances between page request in the following cases:
+ We use the RequestVar to pass Event instances between page requests in the following cases:
  
  * from the initial GET request of a create or edit form to the subsequent 
  PUT request that processes the submitted data (and also between successive PUT requests if they
@@ -200,13 +205,13 @@ state between successive HTML page requests. For the Event instance, this is dec
  * from the list page to a delete, view or edit page
  * from a view page to an edit page
  
-The RequestVar object is declared in a scope such that each 'Ops' class method has access to it. 
+The RequestVar object is declared in a scope such that each related 'Ops' class method has access to it. 
 In our template we put it in class scope, but it could also have been declared at file scope; 
-in some more complex use-cases file scope would be necessary to facilitate 
+in some, more complex, use cases file scope would be necessary to facilitate 
 communication between multiple 'Ops' classes. 
-I'll be giving examples of such use-cases in a future blog post.
+I'll be giving examples of such use cases in a future blog post.
 
-For a more detailed discussion of RequestVars, see another of my other blog post:
+For a more detailed discussion of RequestVars, see my other blog post:
 [Understanding Lift's RequestVars](http://tech.damianhelme.com/understanding-lifts-requestvars)
 
 ## Create
@@ -291,7 +296,7 @@ However, without the location present a form field, and without the SHtml.hidden
 this location setting would be lost if the form submission failed and the create page 
 was reloaded. 
 
-To finish with a brief run through of the rest of this method, 
+To finish this section with a brief run through of the rest of the create method, 
 Line (4) uses a common pattern for binding the fields of a Mapper entity to a HTML form.
 Line (5) registers a function that Lift will call to process the contents of the form
 when it is submitted:
@@ -312,13 +317,13 @@ These are standard Lift techniques, for more information
 see, for example, (Simply Lift)[http://stable.simply.liftweb.net/#toc-Section-7.10]) .
 
 If processSubmit succeeds, we're taken to the listevent.html page which in-turn invokes the EventOps.list method. 
-Note that the SHtml.hidden method will still have set the eventRV, 
-but as the list method does't use the eventRV, it will be silently ignored.
+Note that the SHtml.hidden closure called in EventOps.create will still have set eventRV, 
+but as the list method does't use eventRV, it will be silently ignored.
 
 ## Moving between HTML page views 
 When we move between the list, view and edit pages, we use the event RequestVar to hold the Event instance in memory
 on the server between subsequent page requests. 
-Thus in the list view, when we click on a item's view link, 
+For example, in the list view, when we click on a item's view link, 
 the following view page will be
 rendered using the same event instance in memory as was used to render that line in the list view. 
 Similarly, from an event's view page, 
@@ -371,12 +376,11 @@ This EventOps.list method uses a common pattern for displaying a list of entitie
 For more information, see, for example, Binding To Children section of the Lift Wiki's 
 [Binding Via CSS Selectors](http://www.assembla.com/spaces/liftweb/wiki/Binding_via_CSS_Selectors)).
 
-In brief: at line (2) all the events are loaded from the database into a List held in memory. 
+To summarise,at line (2) all the events are loaded from the database into a list held in memory. 
 Lines (5 - 11) render each event as a line in the table, with associated hyperlinks to the 'viewevent', 
 'editevent' and 'deleteevent' pages.
-Bound with the view and edit link is the function '() => eventRV(t)'. 
-
-This function is called on the server when the link is clicked and sets the eventRV for the scope of the resulting 
+The view and edit links each bind to the fuction '() => eventRV(t)'. 
+This is called on the server when the link is clicked ,setting the eventRV for the scope of the resulting 
 page request to contain the event of the line which was clicked.
 
 ## Edit
@@ -412,7 +416,7 @@ The EventOps.edit snippet:
 This snippet is very similar to the 'create' snippet we discussed previously except with the 
 following differences:
 
-At line (2), we firstly make sure that the eventRV has been set. 
+At line (2), we first make sure that the eventRV has been set. 
 eventRV should have been set when the user clicks on the either of the edit links on the list or view pages.
 Here, we're trapping case that the user has typed in the url page directly. 
 
