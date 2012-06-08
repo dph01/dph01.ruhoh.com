@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  DIY Lift CRUD Database Operations - an alternative to CRUDify
+title:  DIY Lift CRUD - an alternative to CRUDify
 date: 2012-06-04
-tags: [scala, lift]
+tags: [scala, lift, CRUD, Database]
 categories: [code]
 type: draft
 ---
 
-This article describes a simple approach for creating your own CRUD screens with Lift ( 
+This article describes a simple approach for creating your own Database CRUD screens with Lift ( 
 'CRUD' being the common acronym for the database operations of Create, Read, Update, Delete).
 
 ## Why build your own CRUD screens?
@@ -23,7 +23,7 @@ If what you want doesn't quite match what Lift provides,
 thanks to thoughtful class design and useful Scala language features, you can easily override much of the 
 default functionality.
 
-However, as your requirements grow you'll probably find your needs diverging more and more from 
+However, as your database requirements grow you'll probably find your needs diverging more and more from 
 the functionality the Lift libraries provide, and consequently needing to override 
 more and more of the default code.
 
@@ -34,13 +34,13 @@ Adding so much overriding code could easily leave you with
 overly bloated classes, 
 trying to coerce the Lift libraries to perform in ways that they were not designed to perform.
 
-When this happens it often makes more sense to write your own CRUD code from the ground up. 
+When this happens it often makes more sense to write your own database CRUD code from the ground up. 
 With a small investment of effort up front (and probably less than you would imagine)
 you will end up with more concise, easily maintainable code, saving you time in the long run.
 
 ## What is covered?
 This article describes one simple approach for
-organising CRUD code into methods, classes, files and folders. 
+organising database CRUD code into methods, classes, files and folders. 
 It gives a naming convention for the aforementioned artifacts 
 and a simple model depicting allowable screen transitions.
 
