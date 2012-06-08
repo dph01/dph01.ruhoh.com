@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  DIY Lift CRUD - an alternative to CRUDify
+title:  DIY Lift CRUD Database Operations - an alternative to CRUDify
 date: 2012-06-04
 tags: [scala, lift]
 categories: [code]
@@ -36,7 +36,7 @@ trying to coerce the Lift libraries to perform in ways that they were not design
 
 When this happens it often makes more sense to write your own CRUD code from the ground up. 
 With a small investment of effort up front (and probably less than you would imagine)
-you will end up with more concise, easily maintainable code, saving you more time in the long run.
+you will end up with more concise, easily maintainable code, saving you time in the long run.
 
 ## What is covered?
 This article describes one simple approach for
@@ -44,12 +44,12 @@ organising CRUD code into methods, classes, files and folders.
 It gives a naming convention for the aforementioned artifacts 
 and a simple model depicting allowable screen transitions.
 
-It illustrates these principles by giving the complete code for a simple CRUD application 
+It illustrates the approach by giving the complete code for a simple CRUD application 
 for a single database entity called Event, with a single field called 'eventName'.
 
 It selects and discusses coding patterns to achieve
 implementation challenges such as how to 'manage state' on the server between
-successive page requests, how to use CSS Selector Transforms to to efficiently render
+successive page requests and how to use CSS Selector Transforms to to efficiently render
 data as HTML.
 
 I use the Lift Mapper library to persist and retrieve data from the database, 
@@ -85,11 +85,11 @@ The diagram below shows the allowable page transitions, illustrated with the Eve
 We enter the screen flow through either the List or Create
 page and we can only navigate to the View, Edit and Delete pages through links on one of the other pages.
 
-{{urls.media}}/CRUDBasicScreenFow.gif
+![Screen Flow]({{urls.media}}/CRUDBasicScreenFow.gif)
 
 The code is split over a model file, a snippet file and series of HTML templates as shown below:
 
-{{urls.media}}/folders.tiff
+![Folder Structure]({{urls.media}}/folders.gif)
 
 ## Model
 We use Lift's Mapper class to manage database access. Each entity has its own scala file in the model package.
@@ -279,7 +279,7 @@ The instance used on the previous request be lost to garbage collection in the u
 So, the main advantage in this example of including the SHtml.hidden line 
 would be that it prevents unnecessary garbage collection.
 
-However there are some use cases where the SHtml.hidden line would be strictly necessary.
+However there are some use cases where the SHtml.hidden line would be performing an essential function.
 It may have been the case that the Event class had some fields that were not set via the form. 
 For example, suppose that the Event class had member variable containing a foreign key to a
 Location instance (representing the many-to-one relationship in real-life 
@@ -293,8 +293,7 @@ for the create event operation to know the location context from which it have b
 EventOps.create function to set the Event location member accordingly. 
 
 However, without the location present a form field, and without the SHtml.hidden call in the EventOps.create,
-this location setting would be lost if the form submission failed and the create page 
-was reloaded. 
+this location setting would be lost if the form is submitted.
 
 To finish this section with a brief run through of the rest of the create method, 
 Line (4) uses a common pattern for binding the fields of a Mapper entity to a HTML form.
@@ -329,7 +328,7 @@ rendered using the same event instance in memory as was used to render that line
 Similarly, from an event's view page, 
 when when we click on the edit link on that page, the same in memory event instance is used to render the subsequent edit page.
 
-The following sections describe this mechanism in more detail
+The following sections present the code that implements this mechanism.
 
 ## List
 
@@ -376,11 +375,11 @@ This EventOps.list method uses a common pattern for displaying a list of entitie
 For more information, see, for example, Binding To Children section of the Lift Wiki's 
 [Binding Via CSS Selectors](http://www.assembla.com/spaces/liftweb/wiki/Binding_via_CSS_Selectors)).
 
-To summarise,at line (2) all the events are loaded from the database into a list held in memory. 
+To summarise, at line (2) all the events are loaded from the database into a list held in memory. 
 Lines (5 - 11) render each event as a line in the table, with associated hyperlinks to the 'viewevent', 
 'editevent' and 'deleteevent' pages.
 The view and edit links each bind to the fuction '() => eventRV(t)'. 
-This is called on the server when the link is clicked ,setting the eventRV for the scope of the resulting 
+This is called on the server when the link is clicked, setting the eventRV for the scope of the resulting 
 page request to contain the event of the line which was clicked.
 
 ## Edit
@@ -418,18 +417,20 @@ following differences:
 
 At line (2), we first make sure that the eventRV has been set. 
 eventRV should have been set when the user clicks on the either of the edit links on the list or view pages.
-Here, we're trapping case that the user has typed in the url page directly. 
+Here, we're trapping case that the user has typed in the edit page url directly. 
 
-The edit snippet has the same 'SHtml.hidden' mechanism for handling form submission failures, however in 
-this case it is strictly required. The event instance has an 'id' member variable
+The edit snippet has the same 'SHtml.hidden' mechanism, however in 
+this case it performs an essential function.
+The event instance has an 'id' member variable
 corresponding to the primary key of the record in the database
-(Event inherits this field from IdPK). The id field is assigned a value when save is first called on the instance. 
-As we're editing an existing event, the id is non-null
-and so on future calls to 'save', Mapper knows to update an existing record in the database rather than create a new one
+(Event inherits this field from IdPK). The id field is assigned a value when save is first called on the instance.
+When we edit and then save an existing event instance, Mapper uses the id field to know to update an existing record in the database rather than create a new one.
 
-If we didn't have the SHtml.hidden line, the subsequent PUT request would create a new event instance
-which would have an uninitialised id, and so when saved to the database would result
-in a second database instance of the event being created.
+Crucially, we don't render this field as a form field. 
+So, when the form is submitted, if we didn't have the SHtml.hidden field, the event instance on which the other field 
+closures are operating will have been newly created for the POST operation, so will not have had the id set.
+Thus when the save operations gets called on the event instance, this will result in a new (i.e. additional) record being written to the database for this 
+event instance.
 
 ## View
 The viewevent.html template:

@@ -5,6 +5,7 @@ date: 2012-03-01
 tags: [scala, lift]
 categories: [code]
 permalink: understanding-lifts-requestvars
+type: draft
 ---
 
     <p>This post aims to answer some of the questions I originally struggled with when I started using RequestVar's. I think I've got to grips with them sufficiently to help others who are wrestling with the same issue :-). So, here's my contribution to the Lift corpus ...</p>
