@@ -321,7 +321,7 @@ but as the list method does't use eventRV, it will be silently ignored.
 
 ## Moving between HTML page views 
 When we move between the list, view and edit pages, we use the event RequestVar to hold the Event instance in memory
-on the server between subsequent page requests. 
+on the server between page requests. 
 For example, in the list view, when we click on a item's view link, 
 the following view page will be
 rendered using the same event instance in memory as was used to render that line in the list view. 
@@ -416,20 +416,25 @@ This snippet is very similar to the 'create' snippet we discussed previously exc
 following differences:
 
 At line (2), we first make sure that the eventRV has been set. 
-eventRV should have been set when the user clicks on the either of the edit links on the list or view pages.
+We're we're expecting the user to to have navigated here by clicking
+on the edit link on either the list or view page. 
+Both of those links have an associated `() => eventRV(event)` function sets eventRV 
+for this request. 
 Here, we're trapping case that the user has typed in the edit page url directly. 
 
 The edit snippet has the same 'SHtml.hidden' mechanism, however in 
 this case it performs an essential function.
 The event instance has an 'id' member variable
 corresponding to the primary key of the record in the database
-(Event inherits this field from IdPK). The id field is assigned a value when save is first called on the instance.
-When we edit and then save an existing event instance, Mapper uses the id field to know to update an existing record in the database rather than create a new one.
+(Event inherits this field from IdPK). 
+The id field is assigned a value when save is first called on the instance.
+When we edit and then save an existing event instance, 
+Mapper uses the id field to know to update an existing record in the database rather than create a new one.
 
-Crucially, we don't render this field as a form field. 
+Crucially, we don't render this id field as a form field. 
 So, when the form is submitted, if we didn't have the SHtml.hidden field, the event instance on which the other field 
 closures are operating will have been newly created for the POST operation, so will not have had the id set.
-Thus when the save operations gets called on the event instance, this will result in a new (i.e. additional) record being written to the database for this 
+Thus if the save were to be called on this event instance, a duplicate record will be written to the database for this 
 event instance.
 
 ## View
@@ -487,14 +492,13 @@ The EventOps.delete snippet:
 The main technique to note here is that the deletion occurs by Lift calling the 
 `() =>{ e.delete_!}` funtion registered with the 'Yes' link. 
 This function forms a closure around the event instance that the user
-is wanting to delete, and when executed calls the `Mapper.delete_!` function on that instance.
+wants to delete, and when executed calls the `Mapper.delete_!` function on that instance.
 
 ## Summary
 Hopefully this has given you a strong enough starting point from which you can
-start to build your own CRUD forms. Please feel free to copy and past the example
-files given here
+start to build your own CRUD forms. 
 
-After using this technique a couple of times
+After using this approach a couple of times
 I suspect you'll find it easy enough and quick enough for it to become your default
 starting point for all future CRUD functionality.
  
