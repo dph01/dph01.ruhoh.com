@@ -7,7 +7,7 @@ categories: [code]
 type: draft
 ---
 
-This article describes a simple approach for creating your own Database CRUD screens with Lift ( 
+This article describes a simple approach for creating your own database CRUD screens with Lift ( 
 'CRUD' being the common acronym for the database operations of Create, Read, Update, Delete).
 
 ## Why build your own CRUD screens?
@@ -67,13 +67,13 @@ I'm simply highlighting how to bring these techniques together
 in order to implement easily DIY CRUD functionality.
 
 ## Download the code
-You can download the code discussed in this article from http://www.github.com/dph01/lift-CRUDBasic
+You can download the code discussed in this article from [www.github.com/dph01/lift-CRUDBasic](http://www.github.com/dph01/lift-CRUDBasic)
 
 ## Running Version
-You can see a running version of this code at [www.damianhelme.com/crudbasic](www.damianhelme.com/crudbasic)
+You can see a running version of this code at [www.damianhelme.com/crudbasic](http://www.damianhelme.com/crudbasic)
 
 ## Overview
-The user interacts with each data entity through separate HTML pages for each of the following: 
+The user interacts with each data entity through separate HTML pages for each of the following operations: 
 
   * creating a new instance
   * listing all existing instances
@@ -206,8 +206,8 @@ state between successive HTML page requests. For the Event instance, this is dec
  * from a view page to an edit page
  
 The RequestVar object is declared in a scope such that each related 'Ops' class method has access to it. 
-In our template we put it in class scope, but it could also have been declared at file scope; 
-in some, more complex, use cases file scope would be necessary to facilitate 
+In our template we put it in class scope, but it could also have been declared at file scope. 
+In some, more complex, use cases file scope would be necessary to facilitate 
 communication between multiple 'Ops' classes. 
 I'll be giving examples of such use cases in a future blog post.
 
@@ -245,11 +245,11 @@ Most of this standard is Lift form / snippet processing that's described in deta
 in Simply Lift and Exploring Lift, so I won't give a complete commentary on the code here. 
 However, the following points are worth emphasising:
 
-When user makes the initial GET request on eventcreate.html, when line (2) of the create snippet method is executed, 
+When the user makes the initial GET request on eventcreate.html, when line (2) of the create snippet method is executed, 
 eventRV.is is called for
-the first time on this eventRV instance. 
-As we have not yet initialised eventRV elsewhere, eventRV initialises itself
-calling Event.create, the default function specified when we declared eventRV.
+the first time on eventRV. 
+As we have not yet initialised eventRV elsewhere, eventRV initialises itself with a new Event instance;
+the result of calling Event.create, the default function specified when we declared eventRV.
 
 However, if create is being called on a PUT request, 
 which would occur on a form reload after validation has failed, 
@@ -434,8 +434,7 @@ Mapper uses the id field to know to update an existing record in the database ra
 Crucially, we don't render this id field as a form field. 
 So, when the form is submitted, if we didn't have the SHtml.hidden field, the event instance on which the other field 
 closures are operating will have been newly created for the POST operation, so will not have had the id set.
-Thus if the save were to be called on this event instance, a duplicate record will be written to the database for this 
-event instance.
+Thus if the save were to be called on this event instance, a duplicate record will be written to the database.
 
 ## View
 The viewevent.html template:
@@ -495,8 +494,9 @@ This function forms a closure around the event instance that the user
 wants to delete, and when executed calls the `Mapper.delete_!` function on that instance.
 
 ## Summary
-Hopefully this has given you a strong enough starting point from which you can
-start to build your own CRUD forms. 
+And that's it! It might be a bit more work than extending the CRUDify trait,
+but hopefully you'll agree that there's not that much to it, and it's price well worth paying 
+in order to gain full control over your CRUD forms. 
 
 After using this approach a couple of times
 I suspect you'll find it easy enough and quick enough for it to become your default
