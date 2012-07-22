@@ -6,7 +6,6 @@ categories: code
 tags: [scala, lift]
 layout: post
 permalink: twitter-bootstrap-navbar-dropdowns-and-lifts
-type: draft
 ---
 
 
