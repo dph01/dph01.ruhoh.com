@@ -13,26 +13,26 @@ This article describes a simple approach for creating your own CRUD (Create, Rea
 ### Why build your own CRUD screens? 
 
 Lift has a useful trait, CRUDify, that automatically adds CRUD functionality to any class.  
-CRUDify is useful for rapid prototyping and can even be deployed to production where basic functionality is required. 
+CRUDify is useful for rapid prototyping and can even be deployed to production where basic functionality is sufficient. 
 
 You can customise much of the default behaviour by overriding the CRUDify methods. 
 However, there is a practical limit to how far you can go with the customisation.
 
 When your requirements diverge too much from the default CRUDify functionality, 
 you can easily find yourself trying to coerce CRUDify to perform in ways in which it was not designed to perform. 
-This can quickly lead to bloated, convoluted and hard to maintain code. 
+This can quickly lead to bloated, convoluted code that is hard to maintain. 
 At this point it is often easier to abandon CRUDify and write your CRUD screens from the ground up.
 
 ### What is covered?
-This article describes a simple approach for constructing a customised CRUD application.  
-It covers how to organise your applicaton into folders, files, classes, and methods.  A naming convention is 
+This article describes a simple approach for implementing a customised CRUD application.  
+It covers how to organise your application into folders, files, classes, and methods.  A naming convention is 
 provided for these artifacts as well as a simple model illustrating allowable screen transitions.  
 
 The approach is demonstrated with an example consisting of code for a simple CRUD application with a single database entity called Event. 
 Event contains the single field 'eventName'. 
 
-This article also selects and discusses coding patterns that can be used for implementation challenges 
-including managing states on the server between successive page requests and using CSS Selector Transforms 
+This article also suggests coding patterns that can be used for implementation challenges 
+such managing state on the server between successive page requests and using CSS Selector Transforms 
 to efficiently render data as HTML.
 
 The example uses the Lift Mapper trait to read and write data from the database.  
@@ -93,7 +93,6 @@ For example, the code for the Event entity (in /src/main/scala/code/model/Event.
 
 A simple validation rule was added to help test handling of form submission failures, which will be discussed later.
 
-
 ### HTML
 
 The HTML pages for manipulating entities are derived from five Lift templates.
@@ -123,7 +122,6 @@ Note that there is a redundant 'event' in the path. One could have just had /eve
 distinguish between multiple open files in an IDE such as Eclipse.
 
 The contents of each of the HTML template is given below adjacent to the corresponding snippet.
-
 
 ### Snippet
 
