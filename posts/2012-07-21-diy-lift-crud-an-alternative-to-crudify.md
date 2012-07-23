@@ -42,7 +42,7 @@ However, this approach could also equally easily use Lift's Record library or an
 This article assumes that the reader is familiar with basic Lift concepts.
 
 As a minimum, you need to be comfortable with the techniques covered in Chapters 1-4 & 7 of [Simply Lift](http://stable.simply.liftweb.net/)
-or the first eight chapters of [Exploring Lift](http://stable.simply.liftweb.net), up to the section on Mapper.  
+or the first eight chapters of [Exploring Lift](http://exploring.liftweb.net), up to the section on Mapper.  
 
 ### Download the code
 You can download the code discussed in this article from [www.github.com/dph01/lift-CRUDBasic](http://www.github.com/dph01/lift-CRUDBasic)
@@ -291,7 +291,7 @@ when it is submitted:
     }
   
 These are standard Lift techniques, for more information  
-see (Simply Lift)([http://stable.simply.liftweb.net/#toc-Section-7.10]).
+see [Simply Lift](http://stable.simply.liftweb.net/#toc-Section-7.10).
 
 If processSubmit succeeds, we're taken to the listevent.html page which in-turn invokes the EventOps.list method. 
 Note that the SHtml.hidden closure called in EventOps.create will still have set eventRV, 
