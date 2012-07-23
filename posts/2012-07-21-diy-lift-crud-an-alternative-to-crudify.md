@@ -290,8 +290,7 @@ when it is submitted:
       // exiting the function here causes the form to reload
     }
   
-These are standard Lift techniques, for more information  
-see [Simply Lift](http://stable.simply.liftweb.net/#toc-Section-7.10).
+These are standard Lift techniques, for more information see [Simply Lift](http://stable.simply.liftweb.net/#toc-Section-7.10).
 
 If processSubmit succeeds, we're taken to the listevent.html page which in-turn invokes the EventOps.list method. 
 Note that the SHtml.hidden closure called in EventOps.create will still have set eventRV, 
