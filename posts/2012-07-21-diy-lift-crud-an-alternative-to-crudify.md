@@ -152,21 +152,21 @@ Lift returns a HTML form to the browser with the 'action' attribute set to the U
     </form>
 
 When the form is submitted,
-the browser creates and sends a HTTP PUT request to the same URL including the form data in the body of the request. 
+the browser creates and sends a HTTP POST request to the same URL including the form data in the body of the request. 
 
-Lift developers have to decide what to return to the user in response to the PUT.
+Lift developers have to decide what to return to the user in response to the POST.
 
 Within the context of this approach, use the following convention: 
 
   * If the form validation fails (e.g. the name field contains less than three characters), return the same HTML form again with the 
 input fields populated with the content that the user submitted. 
-If the user clicks submit again the browser sends another PUT request and the
+If the user clicks submit again the browser sends another POST request and the
 cycle continues.
   * If the form processing succeeds, redirect the browser to the
 next page in the work-flow, which, in our case, is the List Events page.
 
 When a form is processed, the snippet behind the form is therefore invoked at least twice; 
-once for the initial GET request and once for every subsequent PUT request.
+once for the initial GET request and once for every subsequent POST request.
 
 ### Managing State
 
@@ -179,7 +179,7 @@ state between successive HTML page requests. For the Event instance, this is dec
 RequestVar is used to pass Event instances between page requests in the following cases:
  
  * From the initial GET request of a create or edit form to the subsequent 
- PUT request that processes the submitted data (and also between successive PUT requests if they
+ POST request that processes the submitted data (and also between successive POST requests if they
  occur)
  * From the list page to a delete, view, or edit page
  * From a view page to an edit page
@@ -214,7 +214,7 @@ Events are created through the createevent.html template:
 The corresponding snippet render method is:
 
     def create = {
-      var event = eventRV.is                             
+      val event = eventRV.is                             
       "#hidden" #> SHtml.hidden(() => eventRV(event) ) & 
       "#eventname" #> SHtml.text(eventRV.is.eventName,   
                   name => eventRV.is.eventName(name) ) & 
@@ -230,13 +230,13 @@ the first time on this eventRV instance.
 Since eventRV has not been initialised, eventRV initialises itself with a new Event instance.
 The Event instance is the result of calling Event.create which is the default function specified when eventRV is declared.
 
-If create is called on a PUT request, 
+If create is called on a POST request, 
 which would occur on a form reload after validation has failed, 
 eventRV.is returns the event that was previously set by the SHtml.hidden function at line (3). 
 
 SHtml.hidden inserts a hidden input field into the HTML page and registers an associated 
 server-side function <code>() => eventRV(event)</code> that Lift will call when the form is submitted.
-This function sets the eventRV in the subsequent PUT request to contain the event instance 
+This function sets the eventRV in the subsequent POST request to contain the event instance 
 that was used used in the current request. 
 
 For more information on the pattern used here to pass an instance from one page request to another
@@ -248,7 +248,7 @@ shown here.
 EventRV needs to be set before setting the member variables of Event instance contained in eventRV.
 
 In the 'create' method the SHtml.hidden line isn't strictly necessary, however, it's useful to include as a general rule.
-If this line was omitted, all that would have happened here is that on a PUT request, eventRV would not have been set when it is first accessed.
+If this line was omitted, all that would have happened here is that on a POST request, eventRV would not have been set when it is first accessed.
 A new Event instance would then be created. 
 
 In the example, this would work since the content of the name field would be written to the 
@@ -434,7 +434,7 @@ The snippet code for the view operation is:
       if ( eventRV.set_? ) 
         S.redirectTo("/event/listevent")
          
-      var event = eventRV.is
+      val event = eventRV.is
       "#eventname *" #> eventRV.is.eventName.asHtml &
       "#edit" #> SHtml.link("/event/editevent", () => eventRV(event), Text("edit"))
     }
@@ -461,7 +461,7 @@ The EventOps.delete snippet is:
       if ( ! eventVar.set_? ) 
         S.redirectTo("/event/listevent")
         
-      var e = eventVar.is
+      val e = eventVar.is
       "#eventname" #> eventVar.is.eventName &
       "#yes" #> SHtml.link("/event/listevent", () =>{ e.delete_!}, Text("Yes")) &
       "#no" #> SHtml.link("/event/listevent", () =>{ }, Text("No")) 
