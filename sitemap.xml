@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>http://tech.damianhelme.com/</loc>
+  <lastmod>2012-11-29T17:42:08+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/about/</loc>
+  <lastmod>2012-11-29T17:42:08+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/diy-lift-crud-an-alternative-to-crudify/</loc>
+  <lastmod>2012-11-29T17:42:07+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/understanding-lifts-requestvars/</loc>
+  <lastmod>2012-11-29T17:42:07+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/joel-spolsky-stack-exchange/</loc>
+  <lastmod>2012-11-29T17:42:07+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/scala-sbt-template/</loc>
+  <lastmod>2012-11-29T17:42:07+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/twitter-bootstrap-navbar-dropdowns-and-lifts/</loc>
+  <lastmod>2012-11-29T17:42:07+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/archive/</loc>
+  <lastmod>2012-11-29T17:42:07+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/categories/</loc>
+  <lastmod>2012-11-29T17:42:08+00:00</lastmod>
+</url>
+<url>
+  <loc>http://tech.damianhelme.com/tags/</loc>
+  <lastmod>2012-11-29T17:42:08+00:00</lastmod>
+</url>
+</urlset>
