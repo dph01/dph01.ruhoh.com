@@ -1,5 +1,5 @@
 title : Damian Helme
-tagline: Thoughts on tech stuff ...
+tagline: Blog on tech stuff ...
 author :
   name : Damian Helme
   email : tech@damianhelme.com
@@ -8,7 +8,5 @@ author :
   feedburner : feedname
 
 navigation :
-  - archive.html
-  - tags.html
-  - categories.html
+  - about.md
   
