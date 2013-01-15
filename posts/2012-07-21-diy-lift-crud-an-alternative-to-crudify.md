@@ -431,7 +431,7 @@ The viewevent.html template is:
 The snippet code for the view operation is:
 
     def view = {
-      if ( eventRV.set_? ) 
+      if ( ! eventRV.set_? ) 
         S.redirectTo("/event/listevent")
          
       val event = eventRV.is
